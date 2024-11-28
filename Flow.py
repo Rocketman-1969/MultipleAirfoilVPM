@@ -17,7 +17,7 @@ class Flow:
         Vy = self.V_inf*np.sin(alpha)
         for i in range(len(x)-1):
 
-            if i == fake_index:
+            if i in fake_index:
                 continue
     
             P= self.vpm.get_P_matrix(x, y, x_arb, y_arb, i, j=i)
@@ -66,8 +66,8 @@ class Flow:
             if x_new < self.x_low_val or x_new > self.x_up_val:
                 
                 break
-            if iter > 1000:
-               
+            if iter > 150:
+                print("Streamline iteration limit reached.")
                 break
             iter += 1
 

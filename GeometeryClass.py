@@ -5,10 +5,19 @@ class Geometery:
    
 
     def __init__(self, airfoil):
-        self.airfoil = airfoil
+        
+        self.NACA = airfoil['airfoil']
+        self.n_points = airfoil['n_points']
+        self.TEOption = airfoil['trailing_edge']
+        self.CLDesign = airfoil['CL_design']
+        self.chord = airfoil['chord_length']
+        self.LE = airfoil['Leading_edge']
+        mounting_angle = airfoil['mounting_angle[deg]']
+        self.mounting_angle = np.deg2rad(mounting_angle)
     
     
-    def Cose_cluster(self, n_points):
+    def Cose_cluster(self):
+        n_points = self.n_points
             # Define step size for odd or even number of points
         if n_points % 2 == 1:  # Odd number of points
             # Equation (4.2.16): Calculate delta_theta
@@ -25,9 +34,9 @@ class Geometery:
         return x_cos
 
 
-    def generate_naca4_airfoil(self, naca, x):
+    def generate_naca4_airfoil(self, x):
         # Convert naca to string if it's an integer
-        naca = str(naca)
+        naca = str(self.NACA)
         x = np.atleast_1d(x)  # Ensure x is an array
         
         # Extract NACA parameters
@@ -90,33 +99,23 @@ class Geometery:
 
         return x_coords, y_coords, yc
     
-    def NACA4(self, airfoil):
-        self.NACA = airfoil['airfoil']
-        self.n_points = airfoil['n_points']
-        self.TEOption = airfoil['trailing_edge']
-        self.CLDesign = airfoil['CL_design']
-        chord = airfoil['chord_length']
-        LE = airfoil['Leading_edge']
-        mounting_angle = airfoil['mounting_angle[deg]']
-        mounting_angle = np.deg2rad(mounting_angle)
+    def NACA4(self):
+        
+        x_cos = self.Cose_cluster()
+        x_geo, y_geo, yc = self.generate_naca4_airfoil(x_cos)
+        x_geo_transform = x_geo * self.chord
+        y_geo_transform = y_geo * self.chord
+        x_cos = x_cos * self.chord
+        yc = yc * self.chord
 
-        x_cos = self.Cose_cluster(self.n_points)
-        x_coords, y_coords, yc = self.generate_naca4_airfoil(self.NACA, x_cos)
-        x_coords_transform = x_coords * chord
-        y_coords_transform = y_coords * chord
-        x_cos_transform = x_cos * chord
-        yc_transform = yc * chord
+        R = np.array([[np.cos(self.mounting_angle), -np.sin(self.mounting_angle)], [-np.sin(self.mounting_angle), np.cos(self.mounting_angle)]])
+        coords = np.vstack([x_geo_transform, y_geo_transform])
+        camber = np.vstack([x_cos, yc])
+        transformed_coords = R @ coords
+        transformed_camber = R @ camber
+        x_geo_transformed = transformed_coords[0, :] + self.LE[0]
+        y_geo_transformed = transformed_coords[1, :] + self.LE[1]
+        x_cos = transformed_camber[0, :] + self.LE[0]
+        yc = transformed_camber[1, :] + self.LE[1]
 
-        R = np.array([[np.cos(mounting_angle), -np.sin(mounting_angle)], [np.sin(mounting_angle), np.cos(mounting_angle)]])
-        coords = np.vstack([x_coords_transform, y_coords_transform])
-        camber = np.vstack([x_cos_transform, yc_transform])
-        transformed_coords = R@coords
-        transformed_camber = R@camber
-        x_coords_transformed = transformed_coords[0, :] + LE[0]
-        y_coords_transformed = transformed_coords[1, :] + LE[1]
-        x_cos_transformed = transformed_camber[0, :] + LE[0]
-        yc_transformed = transformed_camber[1, :] + LE[1]
-
-
-
-        return x_coords_transformed, y_coords_transformed, x_cos_transformed, yc_transformed
+        return x_geo_transformed, y_geo_transformed, x_cos, yc

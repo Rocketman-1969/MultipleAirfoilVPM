@@ -23,15 +23,6 @@
             "chord_length" : 1.0,
             "mounting_angle[deg]" : 0.0,
             "CL_design" : 0.2593304460915939
-        },
-        "3" : {
-            "airfoil" : "0012",
-            "trailing_edge" : "closed",
-            "n_points" : 200,
-            "Leading_edge" : [2.0, 0.5],
-            "chord_length" : 0.25,
-            "mounting_angle[deg]" : 1.0,
-            "CL_design" : 0.2593304460915939
         }
     },
     "operating" : {
@@ -47,7 +38,7 @@
         "x_start" : -1.0,
         "x_lower_limit" : -1.0,
         "x_upper_limit" : 3.5,
-        "delta_s" : 0.01,
+        "delta_s" : 0.02,
         "n_lines" : 4,
         "delta_y" : 0.20
     },

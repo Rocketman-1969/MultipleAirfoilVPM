@@ -323,54 +323,61 @@ class Main:
 		"""
 		plt.figure()
 
-		
-		# #calculate stagnation points
-		# forward_stagnation_point, aft_stagnation_point = self.stagnation_point()
-		# print("Forward Stagnation Point: ", forward_stagnation_point)
-		# forward_normal_stag_up, forward_normal_stag_down = self.surface_normal(forward_stagnation_point[0])
-		# aft_normal_stag_up, aft_normal_stag_down = self.surface_normal(aft_stagnation_point[0])
-		# if forward_stagnation_point[1] < 0:
-		# 	forward_normal_stag = forward_normal_stag_down
-		# else:
-		# 	forward_normal_stag = forward_normal_stag_up
-		# if aft_stagnation_point[1] < 0:
-		# 	aft_normal_stag = aft_normal_stag_down
-		# else:
-		# 	aft_normal_stag = aft_normal_stag_up
-
-		# forward_stag_streamline = self.flow.streamlines(forward_stagnation_point[0]+forward_normal_stag[0] * 1e-3, forward_stagnation_point[1]+forward_normal_stag[1] * 1e-3, -1*delta_s, self.x_geo, self.y_geo, self.gamma)
-		# forward_stag_streamline = np.vstack(([forward_stagnation_point[0], forward_stagnation_point[1]], forward_stag_streamline))
-		# aft_stag_streamline = self.flow.streamlines(aft_stagnation_point[0]+aft_normal_stag[0] * 1e-3, aft_stagnation_point[1] + aft_normal_stag[1]*1e-3, delta_s,  self.x_geo, self.y_geo, self.gamma)
-		# aft_stag_streamline = np.vstack(([aft_stagnation_point[0], aft_stagnation_point[1]], aft_stag_streamline))
-		
 		x_all = []
 		y_all = []
 		airfoil_geometry = {}
-
+		
 		for airfoil_key, airfoil in self.airfoils.items():
+			# airfoil_geometry[airfoil_key] = {
+			# 	'x': xgeo_transform,
+			# 	'y': ygeo_transform,
+			# 	'yc': yc,
+			# 	'xcos': xcos,
+			# 	'chord': airfoil['chord_length'],
+			# 	'LE': airfoil['Leading_edge'],
+			# 	'TE': airfoil['trailing_edge'],
+			# 	'NACA': airfoil['airfoil']
+			# }
+			self.LE = airfoil['Leading_edge']
+
+			# #calculate stagnation points
+			#forward_stagnation_point, aft_stagnation_point = self.stagnation_point()
+			# print("Forward Stagnation Point: ", forward_stagnation_point)
+			# forward_normal_stag_up, forward_normal_stag_down = self.surface_normal(forward_stagnation_point[0])
+			# aft_normal_stag_up, aft_normal_stag_down = self.surface_normal(aft_stagnation_point[0])
+			# if forward_stagnation_point[1] < 0:
+			# 	forward_normal_stag = forward_normal_stag_down
+			# else:
+			# 	forward_normal_stag = forward_normal_stag_up
+			# if aft_stagnation_point[1] < 0:
+			# 	aft_normal_stag = aft_normal_stag_down
+			# else:
+			# 	aft_normal_stag = aft_normal_stag_up
+
+			# forward_stag_streamline = self.flow.streamlines(forward_stagnation_point[0]+forward_normal_stag[0] * 1e-3, forward_stagnation_point[1]+forward_normal_stag[1] * 1e-3, -1*delta_s, self.x_geo, self.y_geo, self.gamma)
+			# forward_stag_streamline = np.vstack(([forward_stagnation_point[0], forward_stagnation_point[1]], forward_stag_streamline))
+			# aft_stag_streamline = self.flow.streamlines(aft_stagnation_point[0]+aft_normal_stag[0] * 1e-3, aft_stagnation_point[1] + aft_normal_stag[1]*1e-3, delta_s,  self.x_geo, self.y_geo, self.gamma)
+			# aft_stag_streamline = np.vstack(([aft_stagnation_point[0], aft_stagnation_point[1]], aft_stag_streamline))
+			
+			
+
+		
 			self.setup_Geometry(airfoil)
 			
-			xgeo_transform, ygeo_transform, yc, xcos = self.geometry.NACA4(airfoil)
+			xgeo_transform, ygeo_transform, xcos, yc = self.geometry.NACA4()
 
 			#save the transformed coordinates to x_all and y_all as a multi-dimensional array
 			x_all.append(xgeo_transform)
 			y_all.append(ygeo_transform)
 
 			
-			airfoil_geometry[airfoil_key] = {
-				'x': xgeo_transform,
-				'y': ygeo_transform,
-				'yc': yc,
-				'xcos': xcos,
-				'chord': airfoil['chord_length'],
-				'LE': airfoil['Leading_edge'],
-				'TE': airfoil['trailing_edge'],
-				'NACA': airfoil['airfoil']
-			}
+			
 			plt.plot(xgeo_transform, ygeo_transform, label=f'airfoil {airfoil_key}', color='blue')
+
 			plt.plot(xcos, yc, label=f'Camber Line {airfoil_key}', color='red')
 
 		# Set up the plot
+		
 		
 		plt.xlabel('X')
 		plt.ylabel('Y')
@@ -425,7 +432,7 @@ class Main:
 
 		for airfoil_key, airfoil in self.airfoils.items():
 			self.setup_Geometry(airfoil)
-			xgeo_transform, ygeo_transform, xcos, yc = self.geometry.NACA4(airfoil)
+			xgeo_transform, ygeo_transform, xcos, yc = self.geometry.NACA4()
 
 			#save the transformed coordinates to x_all and y_all as a multi-dimensional array
 			x_all.append(xgeo_transform)
@@ -469,7 +476,7 @@ class Main:
 
 		self.flow = Flow.Flow(self.free_stream_velocity, alpha, self.x_low_val, self.x_up_val, vpm)
 
-		self.plot_streamlines(self.x_start, self.x_low_val, self.x_up_val, self.delta_s, self.n_lines, self.delta_y)
+		self.plot_streamlines(self.x_start, min(self.x_all_flattened)-.5, max(self.x_all_flattened)+.5, self.delta_s, self.n_lines, self.delta_y)
 		
 
 if __name__ == "__main__":
