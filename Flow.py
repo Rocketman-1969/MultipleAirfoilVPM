@@ -3,7 +3,7 @@ from VortexPannelMethod import VortexPannelMethod as vpm
 
 class Flow:
 
-    def __init__(self, V_inf, alpha, x_low_val, x_up_val, vortex_pannel_method=None):
+    def __init__(self, V_inf, alpha, x_low_val, x_up_val, vortex_pannel_method):
         self.V_inf = V_inf
         self.alpha = alpha
         self.x_low_val = x_low_val

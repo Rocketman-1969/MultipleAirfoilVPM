@@ -9,7 +9,6 @@ class VortexPannelMethod:
         self.alpha = alpha
         self.chord = chord
     
-    
     def get_control_points(self, x, y):
         # equation (4.21)
 
@@ -74,6 +73,7 @@ class VortexPannelMethod:
                 A[i,i] = 1.0
                 kutta_start_index = i+1
                 continue
+
             #jth pannel
             for j in range(len(x)-1):
                 P = self.get_P_matrix(x, y, x_cp[i], y_cp[i], i, j)
@@ -105,27 +105,14 @@ class VortexPannelMethod:
         gamma = np.linalg.solve(A,B)
         return gamma
     
-    def get_CL(self, gamma, x, y):
-        CL = 0
-        for i in range(len(x)-1):
-            l_i = self.get_length_of_jth_pannel(x, y, i)
-            CL += (l_i/self.chord)*((gamma[i] + gamma[i+1])/self.velocity)
-        return CL
-    
-    def get_cmle(self, gamma, x, y):
-        Cmle_temp = 0
-        for i in range(len(x)-1):
-            l_i = self.get_length_of_jth_pannel(x, y, i)
-            Cmle_temp+=(l_i/self.chord)*(((2*x[i]*gamma[i]+x[i]*gamma[i+1]+x[i+1]*gamma[i]+2*x[i+1]*gamma[i+1])/(self.chord*self.velocity))*np.cos(np.deg2rad(self.alpha))+((2*y[i]*gamma[i]+y[i]*gamma[i+1]+y[i+1]*gamma[i]+2*y[i+1]*gamma[i+1])/(self.chord*self.velocity))*np.sin(np.deg2rad(self.alpha)))
-        Cmle=-(1/3)*Cmle_temp
-        return Cmle
-    
-    def get_Cmc4(self, CL, Cmle):
+    def find_fake_indices(self, airfoil_lengths):
+        self.fake_indices = []
+        offset = 0
+        for length in airfoil_lengths:
+            self.fake_indices.append(offset + length-1)
+            offset += length
 
-        Cmc4 = Cmle + CL/4 * np.cos(np.deg2rad(self.alpha))
-
-        return Cmc4
-    
+        
 
     def run(self, x_all, y_all):
         print("running VPM")
@@ -133,7 +120,7 @@ class VortexPannelMethod:
         airfoil_lengths = []
         x_cp = []
         y_cp = []
-        print("num_airfoils: ", num_airfoils)
+
         for i in range(num_airfoils):
             x = x_all[i]
             y = y_all[i]
@@ -145,37 +132,13 @@ class VortexPannelMethod:
 
         x_cp,y_cp = self.get_control_points(x_all, y_all)
 
-        self.fake_indices = []
-        offset = 0
-        for length in airfoil_lengths:
-            self.fake_indices.append(offset + length-1)
-            offset += length
+        self.find_fake_indices(airfoil_lengths)
         
-    
         A = self.get_A_matrix(x_all, y_all, x_cp, y_cp)
-        print("A: ", A)
+        print("A matrix calculated", A)
+
         B = self.get_B_matrix(x_all, y_all)
-        print("B: ", B)
+
         gamma = self.get_gamma(A, B)
-        print("gamma: ", gamma)
 
         return gamma, self.fake_indices
-
-    
-    # def run(self, x, y):
-
-    #     x_cp, y_cp = self.get_control_points(x, y)
-        
-    #     A = self.get_A_matrix(x, y, x_cp, y_cp)
-
-    #     B = self.get_B_matrix(x, y)
-       
-    #     gamma = self.get_gamma(A, B)
-
-    #     C_L = self.get_CL(gamma, x, y)
-
-    #     Cmle = self.get_cmle(gamma, x, y)
-
-    #     Cmc4 = self.get_Cmc4(C_L, Cmle)
-
-    #     return C_L, Cmle, Cmc4, x_cp, y_cp, gamma
