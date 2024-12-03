@@ -128,7 +128,7 @@ class VortexPannelMethod:
     
 
     def run(self, x_all, y_all):
-        
+        print("running VPM")
         num_airfoils = x_all.shape[0]
         airfoil_lengths = []
         x_cp = []
@@ -140,8 +140,6 @@ class VortexPannelMethod:
             airfoil_length = len(x)
             airfoil_lengths.append(airfoil_length)
             
-        
-        print("x_cp: ", x_cp)
         x_all = x_all.flatten()
         y_all = y_all.flatten()
 
@@ -150,7 +148,7 @@ class VortexPannelMethod:
         self.fake_indices = []
         offset = 0
         for length in airfoil_lengths:
-            self.fake_indices.append(offset + length - 1)
+            self.fake_indices.append(offset + length-1)
             offset += length
         
     

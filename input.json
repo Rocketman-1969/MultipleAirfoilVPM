@@ -3,22 +3,22 @@
         "airfoil_options" : "xxxx = NACA 4-digit series,ULxx = Uniform Load (requires CL_design),file = read airfoil from file (requires filename)",
         "filename" : "Jahkowski_Airfoil_Geometry.txt",
         "trailing_edge_options" : "open = standard NACA 4-digit open trailing edge,closed = modified thickness to close trailing edge",
-        "n_points" : 200
+        "n_points" : 300
         },
     "airfoils" : {
         "1" : {
             "airfoil" : "2412",
             "trailing_edge" : "closed",
-            "n_points" : 200,
+            "n_points" : 300,
             "Leading_edge" : [0.0, 0.0],
-            "chord_length" : 0.75,
+            "chord_length" : 1.0,
             "mounting_angle[deg]" : 5.0,
             "CL_design" : 0.2593304460915939
         },
         "2" : {
             "airfoil" : "2412",
             "trailing_edge" : "closed",
-            "n_points" : 200,
+            "n_points" : 300,
             "Leading_edge" : [-0.5, 1.0],
             "chord_length" : 1.0,
             "mounting_angle[deg]" : 0.0,
@@ -38,7 +38,7 @@
         "x_start" : -1.0,
         "x_lower_limit" : -1.0,
         "x_upper_limit" : 3.5,
-        "delta_s" : 0.02,
+        "delta_s" : 0.009,
         "n_lines" : 4,
         "delta_y" : 0.20
     },

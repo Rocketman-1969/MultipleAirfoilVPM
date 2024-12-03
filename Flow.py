@@ -35,41 +35,75 @@ class Flow:
         
         return velocity
     
-    def streamlines(self, x, y, delta_s, x_geo, y_geo, gamma, fake_index):
+    def streamlines(self, x, y, delta_s, x_geo, y_geo, gamma, fake_index, tol=1e-10):
         """
-        Calculate the streamlines at a given x-coordinate.
-    
+        Calculate the streamlines at a given x-coordinate using RK45 with adaptive step sizing.
+        
         Parameters:
-        x (float): The x-coordinate at which to calculate the streamlines.
-        delta_s (float): The step size for the streamlines.
-    
+        x (float): The initial x-coordinate.
+        y (float): The initial y-coordinate.
+        delta_s (float): Initial step size for the streamlines.
+        x_geo, y_geo: Geometry arrays for influence calculations.
+        gamma: Circulation strength array.
+        fake_index: Index for excluding self-influence.
+        tol (float): Tolerance for adaptive step sizing.
+        
         Returns:
-        tuple: A tuple containing the streamlines for the upper and lower surfaces.
+        np.array: Streamlines as a 2D array with coordinates [[x1, y1], [x2, y2], ...].
         """
         streamline = []
         iter = 0
-        
+        h = delta_s
+
         while True:
-            k1 = delta_s * self.unit_velocity(x, y, x_geo, y_geo, gamma, fake_index)
-            k2 = delta_s * self.unit_velocity(x + 0.5*k1[0], y + 0.5*k1[1], x_geo, y_geo, gamma, fake_index)
-            k3 = delta_s * self.unit_velocity(x + 0.5*k2[0], y + 0.5*k2[1], x_geo, y_geo, gamma, fake_index)
-            k4 = delta_s * self.unit_velocity(x + k3[0], y + k3[1], x_geo, y_geo, gamma, fake_index)
+            # RK45 coefficients
+            c = [0, 1/4, 3/8, 12/13, 1, 1/2]
+            a = [
+                [],
+                [1/4],
+                [3/32, 9/32],
+                [1932/2197, -7200/2197, 7296/2197],
+                [439/216, -8, 3680/513, -845/4104],
+                [-8/27, 2, -3544/2565, 1859/4104, -11/40]
+            ]
+            b4 = [25/216, 0, 1408/2565, 2197/4104, -1/5, 0]  # Fourth-order solution
+            b5 = [16/135, 0, 6656/12825, 28561/56430, -9/50, 2/55]  # Fifth-order solution
 
-            x_new = x + (k1[0] + 2*k2[0] + 2*k3[0] + k4[0]) / 6
-            y_new = y + (k1[1] + 2*k2[1] + 2*k3[1] + k4[1]) / 6
-            
-            streamline.append([x_new, y_new])
+            # Compute k-values
+            k = []
+            for i in range(len(c)):
+                x_temp = x + h * sum(a[i][j] * k[j][0] for j in range(len(k))) if i > 0 else x
+                y_temp = y + h * sum(a[i][j] * k[j][1] for j in range(len(k))) if i > 0 else y
+                k.append(self.unit_velocity(x_temp, y_temp, x_geo, y_geo, gamma, fake_index))
 
-            x = x_new
-            y = y_new
+            # Fourth and fifth-order solutions
+            x4 = x + h * sum(b4[i] * k[i][0] for i in range(len(k)))
+            y4 = y + h * sum(b4[i] * k[i][1] for i in range(len(k)))
+            x5 = x + h * sum(b5[i] * k[i][0] for i in range(len(k)))
+            y5 = y + h * sum(b5[i] * k[i][1] for i in range(len(k)))
 
-            if x_new < self.x_low_val or x_new > self.x_up_val:
-                
+            # Error estimation
+            error = max(abs(x5 - x4), abs(y5 - y4))
+
+            # Check if error is acceptable
+            if error <= tol:
+                # Accept the step
+                x, y = x5, y5
+                streamline.append([x, y])
+
+            # Adjust step size
+            if error == 0:
+                h *= 2  # Avoid division by zero
+            else:
+                h *= 0.9 * (tol / error) ** 0.2  # Update step size with safety factor
+
+            # Break conditions
+            if x < self.x_low_val or x > self.x_up_val:
                 break
-            if iter > 150:
+
+            iter += 1
+            if iter > 200:  # Optional: safeguard against infinite loops
                 print("Streamline iteration limit reached.")
                 break
-            iter += 1
 
-            
         return np.array(streamline)
