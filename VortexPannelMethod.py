@@ -91,12 +91,14 @@ class VortexPannelMethod:
     def get_B_matrix(self, x, y):
         B = np.zeros((len(x),1))
         alpha = np.deg2rad(self.alpha)
+        a=0
         for i in range(len(x)-1):
             if i in self.fake_indices:
                 B[i,0] = 0.0
+                a+=1
                 continue
             l_j=self.get_length_of_jth_pannel(x,y,i)
-            B[i,0]=self.velocity *(((y[i+1]-y[i])*np.cos(alpha)-(x[i+1]-x[i])*np.sin(alpha))/l_j)
+            B[i,0]=self.velocity *(((y[i+1]-y[i])*np.cos(alpha[a])-(x[i+1]-x[i])*np.sin(alpha[a]))/l_j)
         B[-1,0]=0.0
 
         return B

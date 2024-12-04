@@ -75,7 +75,7 @@ class Main:
 
 	def setup_vortex_pannel_method(self):
 
-		self.vpm = VortexPannelMethod(1.0, self.free_stream_velocity, self.alpha)
+		self.vpm = VortexPannelMethod(1.0, self.free_stream_velocity, [0,0,0])
 
 	def setup_Geometry(self, geometry):
 		"""
@@ -91,7 +91,7 @@ class Main:
 		V_inf (float): The free stream velocity.
 		alpha (float): The angle of attack.
 		"""
-		self.flow = Flow.Flow(self.free_stream_velocity, self.alpha, x_low_val, x_up_val, self.vpm)
+		self.flow = Flow.Flow(self.free_stream_velocity, [0,0,5], x_low_val, x_up_val, self.vpm)
 
 	def plot_streamlines(self, x_low_val, x_up_val):
 		"""

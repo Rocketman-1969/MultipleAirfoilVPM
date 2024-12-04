@@ -5,33 +5,33 @@
     "airfoils" : {
         "1" : {
             "airfoil" : "2412",
-            "n_points" : 101,
+            "n_points" : 200,
             "Leading_edge" : [0.0, 0.0],
             "chord_length" : 1.0,
-            "mounting_angle[deg]" : 5.0
+            "mounting_angle[deg]" : 0.0
         },
         "2" : {
             "airfoil" : "2412",
-            "n_points" : 101,
-            "Leading_edge" : [-0.5, 1.5],
+            "n_points" : 200,
+            "Leading_edge" : [0.0, 0.5],
             "chord_length" : 1.0,
             "mounting_angle[deg]" : 0.0
         },
         "3" : {
             "airfoil" : "2412",
-            "n_points" : 101,
-            "Leading_edge" : [-0.5, 0.75],
+            "n_points" : 200,
+            "Leading_edge" : [0.0, 1.0],
             "chord_length" : 1.0,
-            "mounting_angle[deg]" : 5.0
+            "mounting_angle[deg]" : 0.0
         }
     },
     "operating" : {
-        "freestream_velocity" : 20.0,
+        "freestream_velocity" : 10.0,
         "alpha[deg]" : 0.0
     },
     "plot_options" : {
         "delta_s" : 0.01,
-        "n_lines" : 3,
+        "n_lines" : 4,
         "delta_y" : 0.2
     }
 }
