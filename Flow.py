@@ -11,10 +11,11 @@ class Flow:
         self.vpm = vortex_pannel_method
 
     def flow_around_an_airfoil(self, x, y, x_arb, y_arb, gamma, fake_index):
-        alpha = np.deg2rad(0)
+        alpha = np.deg2rad(self.alpha)
         P=[]
         Vx = self.V_inf*np.cos(alpha)
         Vy = self.V_inf*np.sin(alpha)
+        
         
         for i in range(len(x)-1):
 
@@ -23,12 +24,13 @@ class Flow:
                 continue
     
             P= self.vpm.get_P_matrix(x, y, x_arb, y_arb, i, i)
-
+            
             Vx += gamma[i]*P[0,0]+gamma[i+1]*P[0,1]
             Vy += gamma[i]*P[1,0]+gamma[i+1]*P[1,1]
+            
         
 
-        velocity = np.array([Vx[0], Vy[0]])
+        velocity = np.array([Vx, Vy])
 
         return velocity
     
@@ -38,7 +40,7 @@ class Flow:
         
         return velocity
     
-    def streamlines(self, x, y, delta_s, x_geo, y_geo, gamma, fake_index, tol=1e-11):
+    def streamlines(self, x, y, delta_s, x_geo, y_geo, gamma, fake_index, tol=1e-8):
         """
         Calculate the streamlines at a given x-coordinate using RK45 with adaptive step sizing.
         
@@ -105,7 +107,7 @@ class Flow:
                 break
 
             iter += 1
-            if iter > 200:  # Optional: safeguard against infinite loops
+            if iter > 500:  # Optional: safeguard against infinite loops
                 print("Streamline iteration limit reached.")
                 break
 

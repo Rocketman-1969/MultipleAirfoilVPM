@@ -70,12 +70,14 @@ class Main:
 		self.airfoils = {}
 		for index, element in enumerate(airfoils):
 			self.airfoils[f'element{index}'] = element
+			
+		
 
 		self.geometery = json_vals['geometry']
 
 	def setup_vortex_pannel_method(self):
 
-		self.vpm = VortexPannelMethod(1.0, self.free_stream_velocity, [0,0,0])
+		self.vpm = VortexPannelMethod(1.0, self.free_stream_velocity, self.alpha)
 
 	def setup_Geometry(self, geometry):
 		"""
@@ -91,7 +93,7 @@ class Main:
 		V_inf (float): The free stream velocity.
 		alpha (float): The angle of attack.
 		"""
-		self.flow = Flow.Flow(self.free_stream_velocity, [0,0,5], x_low_val, x_up_val, self.vpm)
+		self.flow = Flow.Flow(self.free_stream_velocity, self.alpha, x_low_val, x_up_val, self.vpm)
 
 	def plot_streamlines(self, x_low_val, x_up_val):
 		"""
@@ -142,13 +144,13 @@ class Main:
 			y = -delta_y * (i+1) + .5
 			streamline = self.flow.streamlines(x, y, delta_s, self.x_all_flattened, self.y_all_flattened, self.gamma, self.fake_index)
 			streamline = np.vstack(([x, y], streamline))
-			plt.plot(streamline[:, 0], streamline[:, 1],color='black')
+			plt.plot(streamline[:, 0], streamline[:, 1],color='black', linewidth=0.5)
 			print("Hold onto your seats, we're calculating those streamlines! ✈️ Predicting lift and making aerodynamic magic happen! 🚀💨")
 			y = delta_y * (i+1) + .5
 			streamline = self.flow.streamlines(x, y, delta_s, self.x_all_flattened, self.y_all_flattened, self.gamma, self.fake_index)
 			streamline = np.vstack(([x, y], streamline))
 			streamline = np.column_stack((streamline, np.full(streamline.shape[0], x), np.full(streamline.shape[0], y)))
-			plt.plot(streamline[:, 0], streamline[:, 1],color='black')
+			plt.plot(streamline[:, 0], streamline[:, 1],color='black', linewidth=0.5)
 
 		plt.xlim(x_low_val, x_up_val)
 		plt.ylim(min(self.y_all_flattened)-.5, max(self.y_all_flattened)+.5)

@@ -24,8 +24,8 @@ class VortexPannelMethod:
     
     def get_xi_eta(self, x, y, x_cp, y_cp, l_j, j):
         xi_eta = []
-
-        matrix1 = np.array([[x[j+1]-x[j], y[j+1]-y[j]], [-(y[j+1]-y[j]), x[j+1]-x[j]]])
+        l_j = self.get_length_of_jth_pannel(x, y, j) 
+        matrix1 = np.array([[x[j+1]-x[j], y[j+1]-y[j]], [-1*(y[j+1]-y[j]), x[j+1]-x[j]]])
         matrix2 = np.array([x_cp-x[j], y_cp-y[j]])
 
         xi_eta =(1/l_j) * np.matmul(matrix1, matrix2)
@@ -58,8 +58,8 @@ class VortexPannelMethod:
         return P
     
     def get_A_matrix(self, x, y, x_cp, y_cp):
-        x = x.flatten()
-        y = y.flatten()
+        # x = x.flatten()
+        # y = y.flatten()
 
         kutta_start_index = 0
 
@@ -81,6 +81,10 @@ class VortexPannelMethod:
                 l_i = self.get_length_of_jth_pannel(x, y, i)
 
                 A[i,j]=A[i,j]+((x[i+1]-x[i])/l_i)*P[1,0]-((y[i+1]-y[i])/l_i)*P[0,0]
+
+                if j in self.fake_indices:
+                    continue
+
                 A[i,j+1]=A[i,j+1]+((x[i+1]-x[i])/l_i)*P[1,1]-((y[i+1]-y[i])/l_i)*P[0,1]
         # apply the kutta condition when fake indices are reached
         A[-1,kutta_start_index] = 1.0
@@ -89,22 +93,22 @@ class VortexPannelMethod:
         return A
     
     def get_B_matrix(self, x, y):
-        B = np.zeros((len(x),1))
+        B = np.zeros((len(x)))
         alpha = np.deg2rad(self.alpha)
-        a=0
+        
         for i in range(len(x)-1):
             if i in self.fake_indices:
-                B[i,0] = 0.0
-                a+=1
+                B[i] = 0.0
                 continue
             l_j=self.get_length_of_jth_pannel(x,y,i)
-            B[i,0]=self.velocity *(((y[i+1]-y[i])*np.cos(alpha[a])-(x[i+1]-x[i])*np.sin(alpha[a]))/l_j)
-        B[-1,0]=0.0
+            B[i]=self.velocity *(((y[i+1]-y[i])*np.cos(alpha)-(x[i+1]-x[i])*np.sin(alpha))/l_j)
+        B[-1]=0.0
 
         return B
     
     def get_gamma(self, A, B):
         gamma = np.linalg.solve(A,B)
+        
         return gamma
     
     def find_fake_indices(self, airfoil_lengths):
