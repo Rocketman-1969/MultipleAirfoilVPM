@@ -2,9 +2,7 @@ import numpy as np
 class VortexPannelMethod:
 
     def __init__(self, chord, velocity, alpha):
-        pass
-        # opens json file and sets airfoil text file as an x and y array
-
+        
         self.velocity = velocity
         self.alpha = alpha
         self.chord = chord
@@ -42,7 +40,7 @@ class VortexPannelMethod:
         psi=(1/2)*np.log((xi**2 + eta**2)/(((xi-l_j)**2)+eta**2))
         return psi
     
-    def get_P_matrix(self, x, y, x_cp, y_cp, i, j):
+    def get_P_matrix(self, x, y, x_cp, y_cp, j):
         l_j = self.get_length_of_jth_pannel(x, y, j)
         
         xi, eta = self.get_xi_eta(x, y, x_cp, y_cp, l_j, j)
@@ -75,15 +73,13 @@ class VortexPannelMethod:
 
             #jth pannel
             for j in range(len(x)-1):
-                P = self.get_P_matrix(x, y, x_cp[i], y_cp[i], i, j)
+                if j in self.fake_indices:
+                    continue
+                P = self.get_P_matrix(x, y, x_cp[i], y_cp[i], j)
 
                 l_i = self.get_length_of_jth_pannel(x, y, i)
 
                 A[i,j]=A[i,j]+((x[i+1]-x[i])/l_i)*P[1,0]-((y[i+1]-y[i])/l_i)*P[0,0]
-
-                if j in self.fake_indices:
-                    continue
-                
                 A[i,j+1]=A[i,j+1]+((x[i+1]-x[i])/l_i)*P[1,1]-((y[i+1]-y[i])/l_i)*P[0,1]
 
         # apply the kutta condition when fake indices are reached

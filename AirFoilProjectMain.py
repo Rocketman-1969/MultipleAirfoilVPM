@@ -3,10 +3,7 @@ import matplotlib.pyplot as plt
 import json
 import GeometeryClass
 import Flow
-from scipy.optimize import newton
 from VortexPannelMethod import VortexPannelMethod
-
-
 
 class Main:
 	"""
@@ -201,7 +198,7 @@ class Main:
 		# Calculate the lower and upper limits for the x-axis
 		x_low_val = min(self.x_all_flattened)-1.0
 		x_up_val = max(self.x_all_flattened)+1.0
-		y_avg = np.mean(self.y_all_flattened)
+		y_avg = np.mean(self.y_all_flattened)-.5
 		
 		# Set up and Run the Vortex Pannel Method
 		self.setup_vortex_pannel_method()

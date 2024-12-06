@@ -23,13 +23,11 @@ class Flow:
                 
                 continue
     
-            P= self.vpm.get_P_matrix(x, y, x_arb, y_arb, i, i)
+            P= self.vpm.get_P_matrix(x, y, x_arb, y_arb, i)
             
             Vx += gamma[i]*P[0,0]+gamma[i+1]*P[0,1]
             Vy += gamma[i]*P[1,0]+gamma[i+1]*P[1,1]
             
-        
-
         velocity = np.array([Vx, Vy])
 
         return velocity
