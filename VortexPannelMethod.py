@@ -1,11 +1,10 @@
 import numpy as np
 class VortexPannelMethod:
 
-    def __init__(self, chord, velocity, alpha):
+    def __init__(self, velocity, alpha):
         
         self.velocity = velocity
         self.alpha = alpha
-        self.chord = chord
     
     def get_control_points(self, x, y):
         # equation (4.21)
@@ -113,9 +112,15 @@ class VortexPannelMethod:
         for length in airfoil_lengths:
             self.fake_indices.append(offset + length-1)
             offset += length
+    
+    def get_CL(self, gamma, x, y, chord):
+        CL = 0
+        for i in range(len(x)-1):
+            l_i = self.get_length_of_jth_pannel(x, y, i)
+            CL += (l_i/chord)*((gamma[i] + gamma[i+1])/self.velocity)
+        return CL
         
-        
-    def run(self, x_all, y_all):
+    def run(self, x_all, y_all, chord):
         print("running VPM")
         num_airfoils = x_all.shape[0]
         airfoil_lengths = []
@@ -142,4 +147,21 @@ class VortexPannelMethod:
 
         gamma = self.get_gamma(A, B)
 
-        return gamma, self.fake_indices
+        index = 0
+        CL_total = 0
+        CL=np.array([])
+        for i in range(num_airfoils):
+            CL_airfoil_x = x_all[index:self.fake_indices[i]]
+            CL_airfoil_y = y_all[index:self.fake_indices[i]]
+            CL_gamma = gamma[index:self.fake_indices[i]]
+            CL_chord = chord[i]
+
+            CL_temp = self.get_CL(CL_gamma, CL_airfoil_x, CL_airfoil_y, CL_chord)
+            CL_total += CL_temp
+            CL = np.append(CL, CL_temp)
+
+            index = self.fake_indices[i] + 1
+        
+        CL = np.append(CL, CL_total)
+
+        return gamma, self.fake_indices, CL

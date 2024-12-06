@@ -74,7 +74,7 @@ class Main:
 
 	def setup_vortex_pannel_method(self):
 
-		self.vpm = VortexPannelMethod(1.0, self.free_stream_velocity, self.alpha)
+		self.vpm = VortexPannelMethod(self.free_stream_velocity, self.alpha)
 
 	def setup_Geometry(self, geometry):
 		"""
@@ -116,10 +116,6 @@ class Main:
 				
 		for airfoil_key, airfoil in self.airfoil_geometry.items():
 
-			#save the transformed coordinates to x_all and y_all as a multi-dimensional array
-			x_all.append(airfoil['x'])
-			y_all.append(airfoil['y'])
-
 			plt.plot(airfoil['x'], airfoil['y'], label=f'airfoil {airfoil_key}', color='blue')
 
 			plt.plot(airfoil['xcos'], airfoil['yc'], label=f'Camber Line {airfoil_key}', color='red')
@@ -134,7 +130,7 @@ class Main:
 		y = y_avg
 		streamline = self.flow.streamlines(x, y, delta_s, self.x_all_flattened, self.y_all_flattened, self.gamma, self.fake_index)
 		streamline = np.vstack(([x, y], streamline))
-		plt.plot(streamline[:, 0], streamline[:, 1],color='black')
+		plt.plot(streamline[:, 0], streamline[:, 1],color='black', linewidth=0.5)
 		for i in range(n_lines):
 			print("Hold onto your seats, we're calculating those streamlines! ✈️ Predicting lift and making aerodynamic magic happen! 🚀💨")
 			x = x_low_val
@@ -166,6 +162,7 @@ class Main:
 		self.airfoil_geometry = {}
 		x_all = []
 		y_all = []
+		chrod_all = []
 
 		for airfoil_key, airfoil in self.airfoils.items():
 			self.setup_Geometry(airfoil)
@@ -174,6 +171,7 @@ class Main:
 			#save the transformed coordinates to x_all and y_all as a multi-dimensional array
 			x_all.append(xgeo_transform)
 			y_all.append(ygeo_transform)
+			chrod_all.append(airfoil['chord_length'])
 
 			self.airfoil_geometry[airfoil_key] = {
 				'x': xgeo_transform,
@@ -192,18 +190,22 @@ class Main:
 		self.x_all_flattened = np.concatenate(self.x_all_flattened)
 		self.y_all_flattened = np.concatenate(self.y_all_flattened)
 
-		self.x_all = np.array(x_all)
-		self.y_all = np.array(y_all)
+		self.x_all = np.array(x_all, dtype=object)
+		self.y_all = np.array(y_all, dtype=object)
 
 		# Calculate the lower and upper limits for the x-axis
-		x_low_val = min(self.x_all_flattened)-1.0
-		x_up_val = max(self.x_all_flattened)+1.0
-		y_avg = np.mean(self.y_all_flattened)-.5
+		x_low_val = min(self.x_all_flattened)-.5
+		x_up_val = max(self.x_all_flattened)+.5
+		y_avg = (max(self.y_all_flattened) + min(self.y_all_flattened))/2
 		
 		# Set up and Run the Vortex Pannel Method
 		self.setup_vortex_pannel_method()
-		self.gamma, self.fake_index = self.vpm.run(self.x_all, self.y_all)
+		self.gamma, self.fake_index, CL = self.vpm.run(self.x_all, self.y_all, chrod_all)
 		
+		for i in range(len(self.airfoil_geometry)):
+			print(f"CL for airfoil {i+1}: {CL[i]}")
+		print(f"Total CL: {CL[-1]}")
+
 		# Set up the Flow Field
 
 		self.load_flow_field(x_low_val, x_up_val)
