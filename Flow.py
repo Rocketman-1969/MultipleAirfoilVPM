@@ -40,7 +40,7 @@ class Flow:
         
         return velocity
     
-    def streamlines(self, x, y, delta_s, x_geo, y_geo, gamma, fake_index, tol=1e-8):
+    def streamlines(self, x, y, delta_s, x_geo, y_geo, gamma, fake_index, tol=1e-10):
         """
         Calculate the streamlines at a given x-coordinate using RK45 with adaptive step sizing.
         

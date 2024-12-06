@@ -95,7 +95,7 @@ class Main:
 		"""
 		self.flow = Flow.Flow(self.free_stream_velocity, self.alpha, x_low_val, x_up_val, self.vpm)
 
-	def plot_streamlines(self, x_low_val, x_up_val):
+	def plot_streamlines(self, x_low_val, x_up_val, y_avg):
 		"""
 		Plot the streamlines for the flow field.
 
@@ -134,19 +134,19 @@ class Main:
 		# Calculate the streamlines
 		print("Hold onto your seats, we're calculating those streamlines! ✈️ Predicting lift and making aerodynamic magic happen! 🚀💨")
 		x = x_low_val
-		y = .5
+		y = y_avg
 		streamline = self.flow.streamlines(x, y, delta_s, self.x_all_flattened, self.y_all_flattened, self.gamma, self.fake_index)
 		streamline = np.vstack(([x, y], streamline))
 		plt.plot(streamline[:, 0], streamline[:, 1],color='black')
 		for i in range(n_lines):
 			print("Hold onto your seats, we're calculating those streamlines! ✈️ Predicting lift and making aerodynamic magic happen! 🚀💨")
 			x = x_low_val
-			y = -delta_y * (i+1) + .5
+			y = -delta_y * (i+1) + y_avg
 			streamline = self.flow.streamlines(x, y, delta_s, self.x_all_flattened, self.y_all_flattened, self.gamma, self.fake_index)
 			streamline = np.vstack(([x, y], streamline))
 			plt.plot(streamline[:, 0], streamline[:, 1],color='black', linewidth=0.5)
 			print("Hold onto your seats, we're calculating those streamlines! ✈️ Predicting lift and making aerodynamic magic happen! 🚀💨")
-			y = delta_y * (i+1) + .5
+			y = delta_y * (i+1) + y_avg
 			streamline = self.flow.streamlines(x, y, delta_s, self.x_all_flattened, self.y_all_flattened, self.gamma, self.fake_index)
 			streamline = np.vstack(([x, y], streamline))
 			streamline = np.column_stack((streamline, np.full(streamline.shape[0], x), np.full(streamline.shape[0], y)))
@@ -189,24 +189,30 @@ class Main:
 			}
 			
 		# Define global airfoil geometery
-		self.x_all_flattened = np.array(x_all).flatten()
-		self.y_all_flattened = np.array(y_all).flatten()
+		self.x_all_flattened = np.array(x_all, dtype=object)
+		self.y_all_flattened = np.array(y_all, dtype=object)
+
+		self.x_all_flattened = np.concatenate(self.x_all_flattened)
+		self.y_all_flattened = np.concatenate(self.y_all_flattened)
+
 		self.x_all = np.array(x_all)
 		self.y_all = np.array(y_all)
 
 		# Calculate the lower and upper limits for the x-axis
 		x_low_val = min(self.x_all_flattened)-1.0
 		x_up_val = max(self.x_all_flattened)+1.0
+		y_avg = np.mean(self.y_all_flattened)
 		
 		# Set up and Run the Vortex Pannel Method
 		self.setup_vortex_pannel_method()
 		self.gamma, self.fake_index = self.vpm.run(self.x_all, self.y_all)
 		
 		# Set up the Flow Field
+
 		self.load_flow_field(x_low_val, x_up_val)
 
 		# Plot the Streamlines
-		self.plot_streamlines(x_low_val, x_up_val)
+		self.plot_streamlines(x_low_val, x_up_val, y_avg)
 		
 if __name__ == "__main__":
 	main = Main('input.json')

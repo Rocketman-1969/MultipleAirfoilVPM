@@ -71,12 +71,12 @@ class Geometery:
 
         # Combine coordinates for the full airfoil, including both leading and trailing edges
         elif self.n_points % 2 == 1:
-            x_coords = np.concatenate([xu[::-1], xl[1:]])
-            y_coords = np.concatenate([yu[::-1], yl[1:]])
+            x_coords = np.concatenate([xl[::-1], xu[1:]])
+            y_coords = np.concatenate([yl[::-1], yu[1:]])
             
         else:
-            x_coords = np.concatenate([xu[::-1], xl])
-            y_coords = np.concatenate([yu[::-1], yl])
+            x_coords = np.concatenate([xl[::-1], xu])
+            y_coords = np.concatenate([yl[::-1], yu])
 
         return x_coords, y_coords, yc
     

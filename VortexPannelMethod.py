@@ -62,7 +62,6 @@ class VortexPannelMethod:
         # y = y.flatten()
 
         kutta_start_index = 0
-
         A = np.zeros((len(x), len(x)))
         #ith control point
         for i in range(len(x)-1):
@@ -84,8 +83,9 @@ class VortexPannelMethod:
 
                 if j in self.fake_indices:
                     continue
-
+                
                 A[i,j+1]=A[i,j+1]+((x[i+1]-x[i])/l_i)*P[1,1]-((y[i+1]-y[i])/l_i)*P[0,1]
+
         # apply the kutta condition when fake indices are reached
         A[-1,kutta_start_index] = 1.0
         A[-1,-1] = 1.0
@@ -117,9 +117,8 @@ class VortexPannelMethod:
         for length in airfoil_lengths:
             self.fake_indices.append(offset + length-1)
             offset += length
-
         
-
+        
     def run(self, x_all, y_all):
         print("running VPM")
         num_airfoils = x_all.shape[0]
@@ -133,8 +132,8 @@ class VortexPannelMethod:
             airfoil_length = len(x)
             airfoil_lengths.append(airfoil_length)
             
-        x_all = x_all.flatten()
-        y_all = y_all.flatten()
+        x_all = np.concatenate(x_all)
+        y_all = np.concatenate(y_all)
 
         x_cp,y_cp = self.get_control_points(x_all, y_all)
 
