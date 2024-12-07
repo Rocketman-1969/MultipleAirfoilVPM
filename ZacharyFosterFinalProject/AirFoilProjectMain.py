@@ -68,6 +68,8 @@ class Main:
 		for index, element in enumerate(airfoils):
 			self.airfoils[f'element{index}'] = element
 			
+		
+
 		self.geometery = json_vals['geometry']
 
 	def setup_vortex_pannel_method(self):

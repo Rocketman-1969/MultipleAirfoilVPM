@@ -104,9 +104,9 @@ class Flow:
             if x < self.x_low_val or x > self.x_up_val:
                 break
 
-            # iter += 1
-            # if iter > 500:  # Optional: safeguard against infinite loops
-            #     print("Streamline iteration limit reached.")
-            #     break
+            iter += 1
+            if iter > 500:  # Optional: safeguard against infinite loops
+                print("Streamline iteration limit reached.")
+                break
 
         return np.array(streamline)

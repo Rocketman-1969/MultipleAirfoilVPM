@@ -8,21 +8,21 @@
             "n_points" : 200,
             "Leading_edge" : [0.0, 0.0],
             "chord_length" : 1.0,
-            "mounting_angle[deg]" : 5.0
+            "mounting_angle[deg]" : 0.0
         },
         "2" : {
-            "airfoil" : "2905",
-            "n_points" : 200,
-            "Leading_edge" : [0.0, 0.50],
-            "chord_length" : 1.0,
-            "mounting_angle[deg]" : 0.0
+            "airfoil" : "2412",
+            "n_points" : 100,
+            "Leading_edge" : [1.0, -0.05],
+            "chord_length" : 0.5,
+            "mounting_angle[deg]" : 10.0
         },
         "3" : {
-            "airfoil" : "2420",
-            "n_points" : 200,
-            "Leading_edge" : [0.0, -0.50],
-            "chord_length" : 1.0,
-            "mounting_angle[deg]" : 0.0
+            "airfoil" : "2412",
+            "n_points" : 50,
+            "Leading_edge" : [1.52, -0.2],
+            "chord_length" : 0.25,
+            "mounting_angle[deg]" : 15.0
         }
     },
     "operating" : {
@@ -31,7 +31,7 @@
     },
     "plot_options" : {
         "delta_s" : 0.01,
-        "n_lines" : 20,
+        "n_lines" : 10,
         "delta_y" : 0.1
     }
 }
